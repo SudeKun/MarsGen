@@ -4,19 +4,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.CodeDom.Compiler;
 
-namespace MarsGen
+namespace tamrin
 {
     internal class Program
     {
         static void Main(string[] args)
         {
-            string first_choise_string;
-            int first_choise_int;
-            bool f_choise=true,two_error=true;
-            string DNA_text, dna = null;
-
-            ///////////////////////////////////////////////////////////////////////////////////////////////////////
             string[] Ala = { "GCT", "GCC", "GCA", "GCG" };
             string[] Arg = { "CGT", "CGC", "CGA", "CGG", "AGA", "AGG" };
             string[] Asn = { "AAT", "AAC" };
@@ -29,7 +24,7 @@ namespace MarsGen
             string[] Ile = { "ATT", "ATC", "ATA" };
             string[] Leu = { "CTT", "CTC", "CTA", "CTG", "TTA", "TTG" };
             string[] Lys = { "AAA", "AAG" };
-            string[] Met = { "ATG" }; //START
+            string[] Met = { "ATG" };
             string[] Phe = { "TTT", "TTC" };
             string[] Pro = { "CCT", "CCC", "CCA", "CCG" };
             string[] Ser = { "TCT", "TCC", "TCA", "TCG", "AGT", "AGC" };
@@ -37,55 +32,118 @@ namespace MarsGen
             string[] Trp = { "TGG" };
             string[] Tyr = { "TAT", "TAC" };
             string[] Val = { "GTT", "GTC", "GTA", "GTG" };
-            string[] Stp = { "TAA", "TGA", "TAG" }; //STOP
-            string[] gender = { Lys[0], Phe[0], Gly[3], Pro[1] };
-            ///////////////////////////////////////////////////////////////////////////////////////////////////////
-            while (f_choise==true)
+            string[] Stp = { "TAA", "TGA", "TAG" };
+            string[] gender = { "AAA", "TTT" , "GGG" , "CCC" };
+            string DNA_text;
+            string dna = null;
+            Console.WriteLine("please enter the way you want to input ");
+            string str_way = Console.ReadLine();
+            int way = 0;
+            bool flag1 = true;
+            while (flag1)
             {
-                Console.WriteLine("Welcome to Project MarsGen!\nPlease select one of these to continue:");
-                Console.WriteLine("1-Open a text file\n2-Write a strand\n3-Random generate a strand");
-                Console.Write("Your choise:");
-                first_choise_string = Console.ReadLine();
-                if (int.TryParse(first_choise_string, out first_choise_int) == true) first_choise_int = Convert.ToInt32(first_choise_string);
-                else { f_choise = true; Console.Clear(); }
-                switch (first_choise_int)
+                if (!(int.TryParse(str_way , out way )))
                 {
-                    case 1:
-                        //Console.Write("Please enter your text file name:");
-                        //DNA_text=Console.ReadLine();
-                        Console.Write("\nYour DNA: ");
-                        DNA_text = "C:\\Users\\sudek\\Documents\\CENG1\\CME 1251\\Project 2\\MarsGen\\dna1.txt";
-                        dna = File.ReadAllText(DNA_text);
-                        char[] Dna_txt = dna.ToCharArray();
-                        Console.WriteLine(dna);
-                        f_choise = false;
-                        break;
-                    case 2:
-                        /*while (two_error == true)
-                        {*/
-                            Console.WriteLine("Please enter your DNA code:");
-                            dna = Console.ReadLine();
-                            char[] Dna_string = dna.ToCharArray();
-                            /*for (int i = 0; i < dna.Length; i++)
-                            {
-                                if (Dna_string[i] == 'A' || Dna_string[i] == 'C' || Dna_string[i] == 'T' || Dna_string[i] == 'G') { two_error = true; }
-                            }
-                            Console.WriteLine("Please write again!\nReminder:You can only use 'A' , 'T' , 'C' , 'G' "); 
-                            two_error = false; 
-                            Console.Clear();*/
-                       // }
-                        f_choise = false;
-                        break;
-                    case 3:
-                        f_choise = false;
-                        break;
-                    default:
-                        f_choise=true;
-                        Console.Clear();
-                        Console.WriteLine("Please enter 1,2 or 3!!\n\n");
-                        break;
+                    Console.WriteLine("the number should be an integer and between 1 and 3");
+                    str_way = Console.ReadLine();
+                }
+                else if (!(way > 0 && way < 4))
+                {
+                    Console.WriteLine("the number must be between 1 and 3 ");
+                    str_way = Console.ReadLine();
+                }
+                else
+                {
+                    flag1 = false;
                 }
             }
+            switch (way)
+            {
+                case 1:
+                    {
+                        DNA_text = @"c:\load dna1.txt";
+                        dna = File.ReadAllText(DNA_text);
+                        char[] Dna = new char[dna.Length];
+                        for (int i = 0; i < dna.Length; i++)
+                        {
+                            Dna[i] = dna[i];
+                        }
+                        Console.WriteLine(Dna);
+                        for (int i = 0; i < Dna.Length; i++)
+                        {
+                            if (!((Dna[i] == 'A') || (Dna[i] == 'C') || (Dna[i] == 'G') || (Dna[i] == 'T' )))
+                            {
+                                Console.WriteLine("you DNA structure is wrong");
+                            }
+
+                        }
+                        break;
+                    }
+                case 2:
+                    {
+                        Console.WriteLine("enter the dna code ");
+                        dna = Console.ReadLine();
+                        char[] Dna = dna.ToCharArray();
+                        for (int i = 0; i < Dna.Length; i++)
+                        {
+                            if (!((Dna[i] == 'A') || (Dna[i] == 'C') || (Dna[i] == 'G') || (Dna[i] == 'T')))
+                            {
+                                Console.WriteLine("you DNA structure is wrong");
+                            }
+                        }
+                        break;
+                    }
+                case 3:
+                    {
+                        string mydna;
+                        Random random = new Random();
+                        random.Next(0, 5);
+                        Console.WriteLine("please enter the gender operation you want ");
+                        string op = Console.ReadLine();
+                        mydna = "AGT" + gender[random.Next(0, gender.Length)] + gender[random.Next(0, gender.Length)] + Stp[random.Next(0, Stp.Length)];
+                        char[] my_dna = mydna.ToCharArray();
+                        bool flag2 = true;
+                        if (op == "f")
+                        {
+                            while (flag2)
+                            {
+                                if (!(((my_dna[4] == 'A') || (my_dna[4] == 'T')) && ((my_dna[7] == 'A') || (my_dna[7] == 'T'))))
+                                {
+                                    mydna = "AGT" + gender[random.Next(0, gender.Length)] + gender[random.Next(0, gender.Length)] + Stp[random.Next(0, Stp.Length)];
+                                    my_dna = mydna.ToCharArray();
+                                }
+                                else
+                                {
+                                    flag2 = false;
+                                }
+                            }
+                            Console.WriteLine(my_dna);
+                        }
+                        else if (op == "m")
+                        {
+                            while (flag2)
+                            {
+                                if ((((my_dna[4] == 'A') || (my_dna[4] == 'T')) && ((my_dna[7] == 'A') || (my_dna[7] == 'T'))) && (!(((my_dna[4] == 'G') || (my_dna[4] == 'C')) && ((my_dna[7] == 'A') || (my_dna[7] == 'T')))))
+                                {
+                                    mydna = "AGT" + gender[random.Next(0, gender.Length)] + gender[random.Next(0, gender.Length)] + Stp[random.Next(0, Stp.Length)];
+                                    my_dna = mydna.ToCharArray();
+                                }
+                                else
+                                {
+                                    flag2 = false;
+                                }
+                            }
+                            Console.WriteLine(my_dna);
+                        }
+                        break;
+                        }
+                default:
+                    {
+                        Console.WriteLine(" sina");
+                        break;
+                    }
+            }
+            Console.ReadLine();
         }
     }
 }
