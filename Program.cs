@@ -135,9 +135,9 @@ namespace MarsGen
 
         static void Main(string[] args)
         {
-            string first_choise_string, second_choise_string, codon, temp = "";
+            string first_choise_string, second_choise_string, codon = "";
             int first_choise_int = 0, second_choise_int = 0, beg = 0;
-            bool first_choise = true, second_choise = true, two_error = true, gene_structure = true, flag = true;
+            bool first_choise = true, second_choise = true, gene_structure = true;
             string DNA_text, dna = null;
 
             ///////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -164,7 +164,7 @@ namespace MarsGen
             string[] Stp = { "TAA", "TGA", "TAG" }; //STOP
             string[] gender = { Lys[0], Phe[0], Gly[3], Pro[1] };
             ///////////////////////////////////////////////////////////////////////////////////////////////////////
-            
+
             while (first_choise == true)
             {
                 Console.WriteLine("Welcome to Project MarsGen!\nPlease select one of these to continue:");
@@ -178,7 +178,8 @@ namespace MarsGen
                     case 1:
                         //Console.Write("Please enter your text file name:");
                         //DNA_text=Console.ReadLine();
-                        DNA_text = @"c:\load dna1.txt";
+                        //DNA_text = @"c:\load dna1.txt";
+                        DNA_text = "C:\\Users\\sudek\\Documents\\CENG1\\CME 1251\\Project 2\\MarsGen\\dna1.txt";
                         dna = File.ReadAllText(DNA_text);
                         dna.ToUpper();
 
@@ -201,7 +202,7 @@ namespace MarsGen
                         break;
 
                     case 3:
-                        dna=random_dna();
+                        dna = random_dna();
                         first_choise = false;
                         break;
                     default:
@@ -218,7 +219,7 @@ namespace MarsGen
                 Dna[i] = dna[i];
             }
 
-            string[] dna_codons = new string[(Dna.Length - 1) / 3];
+            string[] dna_codons = new string[(Dna.Length + 1) / 3];
             //Console.WriteLine(dna_codons.Length);
 
             //Console.WriteLine(Dna);
@@ -233,17 +234,18 @@ namespace MarsGen
             }
 
             Console.Write("\nYour DNA: ");
-            for (int k = 0; k < 1; k++)
+            for (int k = 0; k < (Dna.Length+1) / 3; k++)
             {
-                for (int i = beg; i < Dna.Length; i += 3)
+                for (int i = beg; i <=beg+3; i+= 3)
                 {
-                    if ((i + 2) > Dna.Length) { gene_structure = false; break; }
+                    if ((i + 2) > Dna.Length+1) { gene_structure = false; break; }
                     codon = Convert.ToString(Dna[i]) + Convert.ToString(Dna[i + 1]) + Convert.ToString(Dna[i + 2]);
-                    dna_codons[k] = codon;
-                    Console.Write(dna_codons[k] + " ");
                 }
-                Console.WriteLine(Dna[1]);
+                beg += 3;
+                dna_codons[k] = codon;
             }
+            for (int i = 0; i < dna_codons.Length; i++) Console.Write(dna_codons[i]+" ");
+            Console.WriteLine("\n===>"+dna_codons[1]);
             //////////////////////////////////////////////////////////////////////////////////////////////////
 
             while (second_choise == true)
