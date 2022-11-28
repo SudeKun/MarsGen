@@ -236,21 +236,22 @@ namespace MarsGen
             Console.Write("\nYour DNA: ");
             for (int k = 0; k < (Dna.Length+1) / 3; k++)
             {
-                for (int i = beg; i <=beg+3; i+= 3)
+                for (int i = beg; i <beg+3; i+= 3)
                 {
-                    if ((i + 2) > Dna.Length+1) { gene_structure = false; break; }
-                    codon = Convert.ToString(Dna[i]) + Convert.ToString(Dna[i + 1]) + Convert.ToString(Dna[i + 2]);
+                    int g = i;
+                    if ( g+2 > Dna.Length) { gene_structure = false; break; }
+                    codon = Convert.ToString(Dna[i]) + Convert.ToString(Dna[i +1]) + Convert.ToString(Dna[i+2]);
                 }
-                beg += 3;
                 dna_codons[k] = codon;
+                beg += 3;
             }
             for (int i = 0; i < dna_codons.Length; i++) Console.Write(dna_codons[i]+" ");
             Console.WriteLine("\n===>"+dna_codons[1]);
             //////////////////////////////////////////////////////////////////////////////////////////////////
-
+            Console.WriteLine("\n\nYou entered your DNA");
             while (second_choise == true)
             {
-                Console.WriteLine("\n\nYou entered your DNA\nPlease choose your operation:\n");
+                Console.WriteLine("\nPlease choose your operation:\n");
                 Console.WriteLine("4-Check DNA gene structure\n5-Check DNA of BLOB organism\n6-Produce complement of a DNA sequence\n7-Determine amino acids\n" +
                     "8-Delete codons\n9-Insert codons\n10-Find codons\n11-Reverse codons\n12-Find the number of genes in a DNA strand\n13-Find the shortest gene\n" +
                     "14-Find the longest gene\n15-Find the most repeated n-nucleotide sequence\n16-Hydrogen bond statistics for a DNA strand\n17-Simulate BLOB generations\n18-QUIT\n");
@@ -406,7 +407,22 @@ namespace MarsGen
                         second_choise = true;
                         break;
                     case 16:
+                        int hydrogen_bonds_2=0, hydrogen_bonds_3=0;
+                        for (int i = 0; i < Dna.Length; i++)
+                        {
+                            if(Dna[i] == 'A'|| Dna[i] == 'T')
+                            {
+                                hydrogen_bonds_2++;
+                            }
+                            else
+                            {
+                                hydrogen_bonds_3++;
+                            }
+                        }
 
+                        Console.WriteLine("Number of pairing with 2-hydrogen bonds: " + hydrogen_bonds_2);
+                        Console.WriteLine("Number of pairing with 3-hydrogen bonds: " + hydrogen_bonds_3);
+                        Console.WriteLine("Number of hydrogen bonds: " + ( (hydrogen_bonds_2 * 2) + (hydrogen_bonds_3 * 3) ) );
                         second_choise = true;
                         break;
                     case 17:
