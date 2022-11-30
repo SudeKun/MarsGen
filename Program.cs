@@ -8,6 +8,8 @@ using System.Runtime.InteropServices;
 using System.ComponentModel.Design;
 using System.Drawing;
 using System.Reflection;
+using System.Globalization;
+using Microsoft.Win32.SafeHandles;
 
 namespace MarsGen
 {
@@ -39,7 +41,7 @@ namespace MarsGen
             string[] Stp = { "TAA", "TGA", "TAG" }; //STOP
             string[] gender = { Lys[0], Phe[0], Gly[3], Pro[1] };
             ///////////////////////////////////////////////////////////////////////////////////////////////////////
-            
+
             string mydna;
             Random random = new Random();
             random.Next(0, 5);
@@ -54,7 +56,7 @@ namespace MarsGen
                 {
                     if (!(((my_dna[4] == 'A') || (my_dna[4] == 'T')) && ((my_dna[7] == 'A') || (my_dna[7] == 'T'))))
                     {
-                        mydna = "AGT" + gender[random.Next(0, gender.Length)] + gender[random.Next(0, gender.Length)] + Stp[random.Next(0, Stp.Length)];
+                        mydna = "ATG" + gender[random.Next(0, gender.Length)] + gender[random.Next(0, gender.Length)] + Stp[random.Next(0, Stp.Length)];
                         my_dna = mydna.ToCharArray();
                     }
                     else
@@ -179,7 +181,7 @@ namespace MarsGen
                         //Console.Write("Please enter your text file name:");
                         //DNA_text=Console.ReadLine();
                         //DNA_text = @"c:\load dna1.txt";
-                        DNA_text = "C:\\Users\\sudek\\Documents\\CENG1\\CME 1251\\Project 2\\MarsGen\\dna1.txt";
+                        DNA_text = @"C:\load dna1.txt";
                         dna = File.ReadAllText(DNA_text);
                         dna.ToUpper();
 
@@ -234,19 +236,20 @@ namespace MarsGen
             }
 
             Console.Write("\nYour DNA: ");
-            for (int k = 0; k < (Dna.Length+1) / 3; k++)
+            for (int k = 0; k < (Dna.Length + 1) / 3; k++)
             {
-                for (int i = beg; i <beg+3; i+= 3)
+                for (int i = beg; i < beg + 3; i += 3)
                 {
                     int g = i;
-                    if ( g+2 > Dna.Length) { gene_structure = false; break; }
-                    codon = Convert.ToString(Dna[i]) + Convert.ToString(Dna[i +1]) + Convert.ToString(Dna[i+2]);
+                    if (g + 2 > Dna.Length) { gene_structure = false; break; }
+                    codon = Convert.ToString(Dna[i]) + Convert.ToString(Dna[i + 1]) + Convert.ToString(Dna[i + 2]);
                 }
                 dna_codons[k] = codon;
                 beg += 3;
             }
-            for (int i = 0; i < dna_codons.Length; i++) Console.Write(dna_codons[i]+" ");
-            Console.WriteLine("\n===>"+dna_codons[1]);
+            for (int i = 0; i < dna_codons.Length; i++) Console.Write(dna_codons[i] + " ");
+            Console.WriteLine("\n===>" + dna_codons[0]);
+            Console.WriteLine(dna_codons.Length);
             //////////////////////////////////////////////////////////////////////////////////////////////////
             Console.WriteLine("\n\nYou entered your DNA");
             while (second_choise == true)
@@ -262,8 +265,151 @@ namespace MarsGen
                 switch (second_choise_int)
                 {
                     case 4:
+                        int start_codon = 0 , stop_codon = 0, index_first = 0 , index_last = 0 , flag = 0 ;
+                        if (flag == 0)
+                        {
+                            if (dna_codons[0] != "ATG" || dna_codons[dna_codons.Length - 1] != "TAA" && dna_codons[dna_codons.Length - 1] != "TGA" && dna_codons[dna_codons.Length - 1] != "TAG")
+                            {
+                                flag = 1;
+                            }
+                            for (int i = 0; i < dna_codons.Length; i = i + 2)
+                            {
+                                for (int y = i; y < dna_codons.Length; y += 2)
+                                {
+                                    if (dna_codons[y] == Met[0])
+                                    {
+                                        index_first = y;
+                                    }
+                                    else if (dna_codons[y] == Stp[0] || dna_codons[y] == Stp[1] || dna_codons[y] == Stp[2])
+                                    {
+                                        index_last = y;
+                                        if (index_last != dna_codons.Length - 1 && dna_codons[index_last + 2] != Met[0])
+                                        {
+                                            flag = 1;
+                                        }
+                                        else
+                                        {
+                                            for (int k = index_first + 2; k < index_last; k = k + 2)
+                                            {
+                                                if (dna_codons[k] == Met[0] || dna_codons[k] == Stp[0] || dna_codons[k] == Stp[1] || dna_codons[k] == Stp[2])
+                                                {
+                                                    flag = 1;
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                            for (int o = 0; o < dna_codons.Length; o = o + 2)
+                            {
+                                if (dna_codons[o].Length % 3 != 0)
+                                {
+                                    flag = 2;
+                                }
+                            }
+                        }
+                        else
+                        {
+                            for (int o = 0; o < dna_codons.Length; o = o + 2)
+                            {
+                                if (dna_codons[o].Length % 3 != 0)
+                                {
+                                    flag = 2;
+                                }
+                            }
+                        }
+                        Console.Write("DNA strand: ");
+                        for (int i = 0; i < dna_codons.Length; i++)
+                            Console.Write(dna_codons[i]);
+                        if (flag == 0)
+                            Console.WriteLine("\nGene structure is OK.");
+                        else if (flag == 1)
+                            Console.WriteLine("\nGene structure error.");
+                        else
+                            Console.WriteLine("\nCodon structure error.");
+                        Console.ReadLine();
+                        second_choise = true;
                         break;
                     case 5:
+                        int B_counter = 0;
+                        //cinsiyet kodonlarını test ediyorum
+                        string c1 = dna_codons[2];
+                        string c2 = dna_codons[4];
+                        bool control1 = false;
+                        bool control2 = false;
+                        bool control3 = false;
+                        Console.Write("DNA strand: ");
+                        for (int i = 0; i < dna_codons.Length; i++)
+                            Console.Write(dna_codons[i]);
+                        Console.WriteLine();
+                        if (!((c1 == "TTT" || c1 == "AAA") && (c2 == "TTT" || c2 == "AAA") || (c1 == "GGG" || c1 == "CCC") && c1 != c2 && (c2 == "CCC" || c2 == "GGG")))
+                        {
+                            Console.Write("Gender error. ");
+                            control1 = true;
+                        }
+                        bool aa;
+                        bool bb = true;
+                        //kodon error
+                        for (int i = 0; i < dna_codons.Length && bb == true; i += 2)
+                        {
+                            if (dna_codons[i] == "ATG")
+                            {
+                                aa = true;
+                                for (int s = i + 2; s < dna_codons.Length && aa == true; s += 2)
+                                {
+                                    if (dna_codons[s] == "TAA" || dna_codons[s] == "TGA" || dna_codons[s] == "TAG")
+                                    {
+                                        if (!((s - i) / 2 > 1) || B_counter >= 8)
+                                        {
+                                            Console.Write("Number of codons error. ");
+                                            aa = false;
+                                            bb = false;
+                                            control2 = true;
+                                        }
+                                        else
+                                        {
+                                            B_counter++;
+                                            aa = false;
+                                        }
+
+                                    }
+                                }
+                            }
+                            else if ((B_counter == 0 || B_counter == 1) && i == dna_codons.Length)
+                            {
+                                Console.Write("Number of codons error.");
+                                bb = false;
+                                control2 |= true;
+                            }
+                        }
+                        bool cc;
+                        int counter3 = 0;
+                        //genes error
+                        for (int i = 0; i < dna_codons.Length; i += 2)
+                        {
+                            cc = true;
+                            if (dna_codons[i] == "ATG")
+                            {
+                                for (int d = i + 2; d < dna_codons.Length && cc == true; d += 2)
+                                {
+                                    if (dna_codons[d] == "TAA" || dna_codons[d] == "TGA" || dna_codons[d] == "TAG")
+                                    {
+                                        counter3++;
+                                        cc = false;
+                                    }
+                                }
+                            }
+
+                        }
+                        if (counter3 < 2 || counter3 > 7)
+                        {
+                            Console.Write("Number of genes error.");
+                            control3 = true;
+                        }
+                        if (control1 == false && control2 == false && control3 == false)
+                            Console.Write("BLOB is OK.");
+                        second_choise = true;
+                        Console.ReadLine();
                         break;
                     case 6:
                         break;
@@ -395,22 +541,169 @@ namespace MarsGen
                         break;
 
                     case 12:
+                        int count_1 = 0 , j = 0;
+                        for (int i = 0; i < dna_codons.Length; i++)
+                        {
+                            if (dna_codons[i] == Met[0])
+                            {
+                                for (j = i; j < dna_codons.Length; j++)
+                                {
+                                    if (dna_codons[j] == Stp[0] || dna_codons[j] == Stp[1] || dna_codons[j] == Stp[2])
+                                    {
+                                        count_1++;
+                                    }
+                                }
+                                i = j;
+                            }
+                        }
+                        Console.WriteLine("number of gens : " + count_1);
+                        Console.ReadLine();
                         second_choise = true;
                         break;
                     case 13:
+                        int a = 0 , count = 0 , b = 0 , pos = 0 , c = 0;
+                        int min = int.MaxValue;
+                        string[] min_dna = new string[100];
+                        while(a < dna_codons.Length)
+                        {
+                            if (dna_codons[a] == Met[0])
+                            {
+                                b = a;
+                                count = 1;
+                                while (dna_codons[b] != Stp[0] && dna_codons[b] != Stp[1] && dna_codons[b] != Stp[2])
+                                {
+                                    b++;
+                                    count++;
+                                }
+                                if (count < min)
+                                {
+                                    min = count;
+                                    pos = a;
+                                    c = 0;
+                                    for (int i = a ; i < b + 1; i++)
+                                    {
+                                        min_dna[c++] = dna_codons[i];
+                                    }
+                                }
+
+                            }
+                            a++;
+                        }
+                        Console.WriteLine("shortes gen : ");
+                        for (int i = 0; i < c; i++)
+                        {
+                            Console.Write(min_dna[i] + " ");
+                        }
+                        Console.WriteLine();
+                        Console.WriteLine("nuber of codons in the gen : " + min);
+                        Console.WriteLine("position of the gen : " + (pos + 1));
+                        Console.ReadLine();
                         second_choise = true;
                         break;
                     case 14:
+                        a = 0;
+                        count = 0;
+                        b = 0;
+                        pos = 0;
+                        c = 0;
+                        int max = int.MinValue;
+                        string[] max_dna = new string[100];
+                        while (a < dna_codons.Length)
+                        {
+                            if (dna_codons[a] == Met[0])
+                            {
+                                b = a;
+                                count = 1;
+                                while (dna_codons[b] != Stp[0] && dna_codons[b] != Stp[1] && dna_codons[b] != Stp[2])
+                                {
+                                    b++;
+                                    count++;
+                                }
+                                if (count > max)
+                                {
+                                    max = count;
+                                    pos = a;
+                                    c = 0;
+                                    for (int i = a; i < b + 1; i++)
+                                    {
+                                        max_dna[c++] = dna_codons[i];
+                                    }
+                                }
+
+                            }
+                            a++;
+                        }
+                        Console.WriteLine("longest gen : ");
+                        for (int i = 0; i < c; i++)
+                        {
+                            Console.Write(max_dna[i] + " ");
+                        }
+                        Console.WriteLine();
+                        Console.WriteLine("nuber of codons in the gen : " + max);
+                        Console.WriteLine("position of the gen : " + (pos + 1));
+                        Console.ReadLine();
                         second_choise = true;
                         break;
                     case 15:
+                        int repeate = 0, z = 0 , v = 0 , t = 0;
+                        int max_rep = int.MinValue;
+                        string[] num = new string[100];
+                        string[] max_repeat = new string[100];
+                        Console.WriteLine("Enter the number of nucletide ");
+                        int number = Convert.ToInt32(Console.ReadLine());
+                        for (int i = 0; i < Dna.Length; i++)
+                        {
+                            while (z < Dna.Length)
+                            {
+                                v = 0;
+                                for (int h =z; h <= number; h++)
+                                {
+                                    num[v] = Convert.ToString(Dna[h]);
+                                    v++;
+                                }
+                                number++;
+                                for (int l = 0; l < Dna.Length; l++)
+                                {
+                                    t = 0;
+                                    bool flag_1 = true;
+                                    while (t <= number)
+                                    {
+                                        if (num[t] == Convert.ToString(Dna[l]))
+                                        {
+                                            repeate++;
+                                        }
+                                        t++;
+                                    }
+                                    if (repeate > max_rep)
+                                    {
+                                        max_rep = repeate;
+                                        for (int y = 0; y < num.Length; y++)
+                                        {
+                                            max_repeat[y] = num[y];
+                                        }
+                                    }
+                                }
+                                z++;
+                            }
+                        }
+                        Console.Write("thr number of nucletide you enter : ");
+                        Console.Write(number);
+                        Console.WriteLine();
+                        Console.WriteLine("most repeate sequence : ");
+                        for (int u = 0; u < max_repeat.Length; u++)
+                        {
+                            Console.Write(max_repeat[u]);
+                        }
+                        Console.WriteLine();
+                        Console.WriteLine("frequency : " + max_rep);
+                        Console.ReadLine();
                         second_choise = true;
                         break;
                     case 16:
-                        int hydrogen_bonds_2=0, hydrogen_bonds_3=0;
+                        int hydrogen_bonds_2 = 0, hydrogen_bonds_3 = 0;
                         for (int i = 0; i < Dna.Length; i++)
                         {
-                            if(Dna[i] == 'A'|| Dna[i] == 'T')
+                            if (Dna[i] == 'A' || Dna[i] == 'T')
                             {
                                 hydrogen_bonds_2++;
                             }
@@ -422,7 +715,7 @@ namespace MarsGen
 
                         Console.WriteLine("Number of pairing with 2-hydrogen bonds: " + hydrogen_bonds_2);
                         Console.WriteLine("Number of pairing with 3-hydrogen bonds: " + hydrogen_bonds_3);
-                        Console.WriteLine("Number of hydrogen bonds: " + ( (hydrogen_bonds_2 * 2) + (hydrogen_bonds_3 * 3) ) );
+                        Console.WriteLine("Number of hydrogen bonds: " + ((hydrogen_bonds_2 * 2) + (hydrogen_bonds_3 * 3)));
                         second_choise = true;
                         break;
                     case 17:
