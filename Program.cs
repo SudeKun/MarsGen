@@ -261,25 +261,27 @@ namespace MarsGen
             else gender = "none";
             return gender;
         }
-        static int find_c_g(string[] codon)
+        static double find_c_g(string[] codon,string[] faulty)
         {
-            int count = 0;
-            int error = 0;
-            int i = 0;
-            while (i< codon.Length)
+            double count = 0;
+            for (int index = 0; index < codon.Length; index++)
             {
-                if (codon[i] == "CCC" || codon[i]=="GGG" || codon[i]== "GCC" || codon[i]== "GCG" || codon[i]== "CGC" || codon[i] == "CGG" || codon[i] == "GGC" || codon[i] == "CCG")
+                if ( ((codon[index] == faulty[0] || codon[index] == faulty[1]) || (codon[index] == faulty[2] || codon[index] == faulty[3])) || ((codon[index] == faulty[4] || codon[index] == faulty[5]) || (codon[index] == faulty[6] || codon[index] == faulty[7])) )
                 {
-                    count++;
-                    if (count > 2)
+                    if (((codon[index+1] == faulty[0] || codon[index + 1] == faulty[1]) || (codon[index + 1] == faulty[2] || codon[index + 1] == faulty[3])) || ((codon[index + 1] == faulty[4] || codon[index + 1] == faulty[5]) || (codon[index + 1] == faulty[6] || codon[index + 1] == faulty[7])))
                     {
-                        error++;
-                        count = 0;
+                        if (((codon[index + 2] == faulty[0] || codon[index + 2] == faulty[1]) || (codon[index + 2] == faulty[2] || codon[index + 2] == faulty[3])) || ((codon[index + 2] == faulty[4] || codon[index + 2] == faulty[5]) || (codon[index + 2] == faulty[6] || codon[index + 2] == faulty[7])))
+                        {
+                            if (((codon[index + 3] == faulty[0] || codon[index + 3] == faulty[1]) || (codon[index + 3] == faulty[2] || codon[index + 3] == faulty[3])) || ((codon[index + 3] == faulty[4] || codon[index + 3] == faulty[5]) || (codon[index + 3] == faulty[6] || codon[index + 3] == faulty[7])))
+                            {
+                                count -= 2;
+                            }
+                            count += 3;
+                        }
                     }
                 }
-                i++;
             }
-            return error;
+            return count;
         }
         static void Main(string[] args)
         {
@@ -317,6 +319,7 @@ namespace MarsGen
                 string[] Val = { "GTT", "GTC", "GTA", "GTG" };
                 string[] Stp = { "TAA", "TGA", "TAG" }; //STOP
                 string[] gender = { Lys[0], Phe[0], Gly[3], Pro[1] };
+                string[] faulty = { "GGG", "GCG", "GGC", "CGG", "CCG", "CGC", "GCC", "CCC" };
                 ///////////////////////////////////////////////////////////////////////////////////////////////////////
 
                 Console.WriteLine("Welcome to Project MarsGen!\nPlease select one of these to continue:");
@@ -893,6 +896,7 @@ namespace MarsGen
                             Random random = new Random();
                             string dna1 = dna, dna2 = "", blob3_gender = "";
                             int blob3_length;
+                            int blob3_length_count=0;
                             /*char[] blob1 = dna1.ToCharArray();
                             string[] blob1_codon = make_codon(blob1, 0, true);
                             string blob1_gender = blob_gender(blob1_codon);*/
@@ -926,21 +930,22 @@ namespace MarsGen
                                 string[] blob2_codon = make_codon(blob2, 0, true);
                                 string blob2_gender = blob_gender(blob2_codon);
 
-                                if(blob1_gender== blob2_gender) { Console.WriteLine("Sorry but you entered wrong gender. Please enter again!"); gene_structure = false; }
+                                if(blob1_gender== blob2_gender) { Console.WriteLine("Sorry but you entered wrong gender. Please enter again!"); generation = 0; gene_structure = false; }
                                 
 
                                 if (blob1.Length == blob2.Length || (blob1.Length > blob2.Length)) blob3_length = blob1.Length;
                                 else blob3_length = blob2.Length;
                                 char[] blob3 = new char[blob3_length];
                                 string[] blob3_codon = make_codon(blob3, 0, true);
+
                                 for (int i = 0; i <= 4; i++)
                                 {
-                                    while (i < 1)
+                                    while (i < 2)
                                     {
                                         blob3_codon[i] = blob1_codon[i];
                                         i++;
                                     }
-                                    while (i >= 1 && i < 4)
+                                    while (i >= 2 && i < 4)
                                     {
                                         blob3_codon[i] = blob2_codon[i];
                                         i++;
@@ -961,16 +966,17 @@ namespace MarsGen
                                         {
 
                                             blob3_codon[codon_int] = blob1_codon[codon_int];
-                                            if ( (blob1_codon[codon_int] == Stp[0] || blob1_codon[codon_int] == Stp[1]) || blob1_codon[codon_int] == Stp[2]) gen = false;
+                                            if ((blob1_codon[codon_int] == Stp[0] || blob1_codon[codon_int] == Stp[1]) || blob1_codon[codon_int] == Stp[2])
+                                            {
+                                                gen = false;
+                                            }
                                             codon_int++;
                                         }
                                     }
-
                                     catch
                                     {
                                         first_blob = false;
                                     }
-
                                     int dna2_codon_int = codon_int;
                                     gen = true;
                                     bool starting = false;
@@ -984,9 +990,11 @@ namespace MarsGen
                                             }
                                             if (starting)
                                             {
-
                                                 blob3_codon[codon_int] = blob2_codon[dna2_codon_int];
-                                                if ( ((blob1_codon[codon_int] == Stp[0] || blob1_codon[codon_int] == Stp[1]) || blob1_codon[codon_int] == Stp[2]) )  gen = false;
+                                                if (((blob2_codon[dna2_codon_int] == Stp[0] || blob2_codon[dna2_codon_int] == Stp[1]) || blob2_codon[dna2_codon_int] == Stp[2]))
+                                                {
+                                                    gen = false;
+                                                }
                                                 codon_int++;
                                             }
                                             dna2_codon_int++;
@@ -997,32 +1005,41 @@ namespace MarsGen
                                         second_blob = false;
                                     }
                                 }
+                                if(generation >= 1 && generation<=20) Console.Write("Generation "+generation+"\nBLOB 1-" + blob1_gender + ":"+ dna1+"\nBLOB 2-"+ blob2_gender+ ":" + dna2);
+
+                                
+
                                 dna1 = codon_to_dna(blob3_codon);
-                                int c_g=find_c_g(blob3_codon);
-                                float ratio = (float)(c_g / blob3_codon.Length );
+
+                                double c_g=find_c_g(blob3_codon,faulty);
+                                double ratio = (c_g * 100 / (double)blob3_codon.Length);
+
+                                if (generation >= 1 && generation < 20)
+                                {
+                                    Console.Write("\nBLOB 3-" + blob3_gender + ":");
+                                    show(dna1);
+                                    Console.WriteLine("\nBLOB3 faulty codons ratio = " + ratio + "%");
+                                }
                                 if (ratio > 10)
                                 {
                                     Console.WriteLine("Newborn dies. Generations are over.");
                                     gene_structure = false;
                                     second_choise = true;
+                                    Console.ReadLine();
                                 }
-                                else if (generation <=20 && ratio<=10)
-                                {
-                                    Console.Write("BLOB3 -" + blob3_gender + " : ");
-                                    show(dna1);
-                                    Console.WriteLine("\nBLOB3 faulty codons ratio = " + ratio + "%");
-                                    generation++;
+                                else if(generation==20) {
+                                    Console.Clear();
+                                    Console.WriteLine("Please wait for other test generations."); 
                                 }
-                                else if (generation > 20 && ratio <= 10)
+                                else if (generation >20 && generation < 100) Console.Write("+");
+                                else if (generation == 100)
                                 {
-                                    generation++;
-                                }
-                                else if (generation<=100 && ratio <= 10)
-                                {
+                                    Console.Clear();
                                     Console.WriteLine("Generations continues after.");
                                     second_choise = true;
                                     gene_structure = false;
                                 }
+                                generation++;
                             }
                             break;
                         case 18:
