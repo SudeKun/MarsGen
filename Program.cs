@@ -285,10 +285,10 @@ namespace MarsGen
         }
         static void Main(string[] args)
         {
-            string DNA_text = "C:\\Users\\sudek\\Documents\\CENG1\\CME 1251\\Project 2\\MarsGen\\dna1.txt";
+            string DNA_text = @".\dna1.txt";
             StreamReader dna_text= File.OpenText(DNA_text);
-            bool game = true;
-            while (game == true)
+            bool project = true;
+            while (project == true)
             {
 
                 string second_choise_string, codon = "";
@@ -326,6 +326,7 @@ namespace MarsGen
                 dna = enter_dna(dna_text);
 
                 //////////////////////////////////////////////////////////////////////////////////////////////////
+                
                 char[] Dna = dna.ToCharArray();
                 string[] dna_codons = new string[(dna.Length / 3)];
                 dna_codons = make_codon(Dna, beg, gene_structure);
@@ -334,9 +335,12 @@ namespace MarsGen
                 Console.WriteLine("You entered your DNA");
                 while (second_choise == true)
                 {
-                    Console.Write("\nYour DNA:");
+                    Console.WriteLine("To continue please press enter..");
+                    Console.ReadLine();
+                    Console.Clear();
+                    Console.Write("Your DNA:");
                     show(dna);
-                    Console.WriteLine("\nPlease choose your operation:");
+                    Console.WriteLine("\n\nPlease choose your operation:\n");
                     Console.WriteLine(
                         "4-Check DNA gene structure\n5-Check DNA of BLOB organism\n6-Produce complement of a DNA sequence\n7-Determine amino acids\n" +
                         "8-Delete codons\n9-Insert codons\n10-Find codons\n11-Reverse codons\n12-Find the number of genes in a DNA strand\n13-Find the shortest gene\n" +
@@ -415,7 +419,6 @@ namespace MarsGen
                                 Console.WriteLine("\nGene structure error.");
                             else
                                 Console.WriteLine("\nCodon structure error.");
-                            Console.ReadLine();
                             second_choise = true;
                             break;
                         case 5:
@@ -439,7 +442,7 @@ namespace MarsGen
                             //kodon error
                             for (int i = 0; i < dna_codons.Length && bb == true; i += 2)
                             {
-                                if (dna_codons[i] == Met[0])
+                                if (dna_codons[i] == "ATG")
                                 {
                                     aa = true;
                                     for (int s = i + 2; s < dna_codons.Length && aa == true; s += 2)
@@ -496,13 +499,14 @@ namespace MarsGen
                             {
                                 Console.Write("BLOB is OK.");
                             }
+                            Console.WriteLine();
                             second_choise = true;
-                            Console.ReadLine();
                             break;
                         case 6:
                             char[] complement = new char[dna.Length];
-                            Console.WriteLine("DNA strand : " + dna);
-                            Console.Write("Complement : ");
+                            Console.WriteLine("DNA strand : ");
+                            show(dna);
+                            Console.Write("\nComplement : ");
                             for (int i = 0; i < dna.Length; i++)
                             {
                                 if (Dna[i] == 'A')
@@ -513,8 +517,10 @@ namespace MarsGen
                                     complement[i] = 'C';
                                 else if (Dna[i] == 'C')
                                     complement[i] = 'G';
-                                Console.Write(complement[i]);
                             }
+                            string comple=new string(complement);
+                            show(comple);
+                            Console.WriteLine();
                             break;
                         case 7:
                             int h7 = 0;
@@ -522,7 +528,7 @@ namespace MarsGen
                             Console.Write("DNA strand  : ");
                             show(dna);
                             make_codon(Dna, 0, true);
-                            Console.Write("\n" + "Amino Acids : " + " ");
+                            Console.Write("\n" + "Amino Acids : " );
                             for (int i = 0; i < Dna.Length; i += 3)
                             {
                                 codon = Convert.ToString(Dna[i]) + Convert.ToString(Dna[i + 1]) + Convert.ToString(Dna[i + 2]);
@@ -571,6 +577,7 @@ namespace MarsGen
                                     Console.Write("" + "END" + " ");
                                 y7++;
                             }
+                            Console.WriteLine();
                             break;
                         case 8:
                             string dna_codons8start = "";
@@ -636,7 +643,7 @@ namespace MarsGen
                                 else ad = false;
                             }
 
-                            Console.Write("From which codon will you start the deletion?" + "  →" + "  Answer : ");
+                            Console.Write("From which codon will you start the addition?" + "  →" + "  Answer : ");
                             mth_codon = Convert.ToInt16(Console.ReadLine());
                             char[] added = new char[Dna.Length + add.Length];
                             char[] afteradd = new char[Dna.Length];
@@ -652,56 +659,78 @@ namespace MarsGen
                             break;
 
                         case 10:
-                            string find3 = null;
-                            int find_from;
-                            Console.Write("\nCodons you want to find" + "  →" + "  Answer : ");
-                            char[] find = Console.ReadLine().ToUpper().ToCharArray();
-                            Console.Write("Starting point:");
-                            find_from = Convert.ToInt32(Console.ReadLine());
-
-                            string[] finding = new string[(find.Length)];
-                            for (int k = 0; k < 1; k++)
+                            Console.Write("\nFrom which codon will you start?" + "  →" + "  Answer : ");
+                            int starting1 = Convert.ToInt32(Console.ReadLine());
+                            Console.Write("\nPlease enter codon sequence" + "  →" + "  Answer : ");
+                            string codon_sequence = Console.ReadLine();
+                            codon_sequence.ToUpper();
+                            int f = 0, result = -1, flag_5 = 0;
+                            for (int i = starting1 - 1; i < Dna.Length; i++)
                             {
-                                for (int i = find_from * 3; i < find.Length; i += 3)
+                                if (f < Dna.Length)
                                 {
-                                    if ((i + 2) > find.Length)
+                                    if (Dna[i] == codon_sequence[f])
                                     {
-                                        gene_structure = false;
-                                        break;
+
+                                        for (int k = i; k < Dna.Length + i; k++)
+                                        {
+
+                                            if (f < codon_sequence.Length)
+                                            {
+                                                if (codon_sequence[f] == Dna[k])
+                                                {
+                                                    flag_5 = 1;
+                                                    result = k - f + 1;
+                                                    f++;
+                                                }
+                                                else
+                                                {
+                                                    flag_5 = 0;
+                                                    f = 0;
+                                                }
+                                            }
+                                        }
                                     }
-                                    find3 = Convert.ToString(find[i]) + Convert.ToString(find[i + 1]) +
-                                            Convert.ToString(find[i + 2]);
-                                    finding[k] = find3;
-                                    Console.Write(" " + finding[k]);
                                 }
-                                if (find3 == null) Console.WriteLine("Result: -1");
-                                else {
-                                    find_from++;
-                                    Console.WriteLine("Result: " + find_from);
-                                }
+                            }
+                            if (flag_5 == 1)
+                            {
+                                Console.WriteLine("Codon sequence: " + codon_sequence);
+                                Console.WriteLine("Starting from: " + starting1);
+                                Console.WriteLine("Result: " + (result + 1));
+                            }
+                            else
+                            {
+                                Console.WriteLine("Codon sequence: " + codon_sequence);
+                                Console.WriteLine("Starting from: " + starting1);
+                                Console.WriteLine("Result: -1 (Not found)");
                             }
                             second_choise = true;
                             break;
                         case 11:
-                            int reverse_from, reverse;
-                            string[] reversed = dna_codons;
-                            string[] reversed_dna = new string[dna_codons.Length];
-                            Console.WriteLine("Please enter position (from m th codon):");
-                            reverse_from = Convert.ToInt32(Console.ReadLine());
-                            Console.WriteLine("How many codons do you want to reverse:");
-                            reverse = Convert.ToInt32(Console.ReadLine());
-
-                            if ((reverse_from + reverse) > dna_codons.Length || reverse_from < 0 || reverse < 0)
+                            Console.Write("\nFrom which codon will you start to reverse codons?" + "  →" + "  Answer : ");
+                            int start2 = Convert.ToInt32(Console.ReadLine());
+                            Console.Write("How many codons will you reverse?" + "  →" + "  Answer : ");
+                            int stop = Convert.ToInt32(Console.ReadLine());
+                            int revers = start2 + stop;
+                            string[] add_revers = new string[100];
+                            string[] reversed= new string[dna_codons.Length];
+                            for (int i = start2 - 1; i < start2 + stop - 2; i++)
                             {
-                                Console.WriteLine("ERROR,TRY AGAIN");
+                                add_revers[i] = dna_codons[i];
+                                dna_codons[i] = dna_codons[revers - 2];
+                                dna_codons[revers - 2] = add_revers[i];
+
+                                revers--;
                             }
-
-                            Array.Reverse(reversed);
-
-                            for (int i = 0; i < dna_codons.Length; i++)
+                            for (int u = 0; u < dna_codons.Length; u++)
                             {
-                                reversed_dna[i] = dna_codons[i];
+                                reversed[u]=dna_codons[u];
                             }
+                            dna = codon_to_dna(reversed);
+                            Console.Write("\nReversed: ");
+                            show(dna);
+                            Console.WriteLine();
                             second_choise = true;
                             break;
                         case 12:
@@ -721,7 +750,6 @@ namespace MarsGen
                                 }
                             }
                             Console.WriteLine("Number of Gens : " + count_1);
-                            Console.ReadLine();
                             second_choise = true;
                             break;
                         case 13:
@@ -761,7 +789,6 @@ namespace MarsGen
                             Console.WriteLine();
                             Console.WriteLine("Number of Codons in the Gen : " + min);
                             Console.WriteLine("Position of the gen : " + (pos + 1));
-                            Console.ReadLine();
                             second_choise = true;
                             break;
                         case 14:
@@ -801,7 +828,6 @@ namespace MarsGen
                             Console.WriteLine();
                             Console.WriteLine("Number of codons in the gen : " + max);
                             Console.WriteLine("Position of the gen : " + (pos + 1));
-                            Console.ReadLine();
                             second_choise = true;
                             break;
 
@@ -863,10 +889,7 @@ namespace MarsGen
                                     for (int i = icharDNAarray; i < n + icharDNAarray; i++)
                                         Max[iMax++] = Dna[i];
                                 }
-
-
                                 icharDNAarray++;
-
                             }// end of whileeeee
 
                             Console.Write("Most repeated sequence :");
@@ -874,8 +897,6 @@ namespace MarsGen
                                 Console.Write(Max[i]);
                             Console.WriteLine();
                             Console.WriteLine("Frequency:" + max_2);
-                            Console.ReadLine();
-                            Console.ReadLine();
                             second_choise = true;
                             break;
                         case 16:
@@ -1006,14 +1027,9 @@ namespace MarsGen
                                     }
                                 }
                                 if(generation >= 1 && generation<=20) Console.Write("Generation "+generation+"\nBLOB 1-" + blob1_gender + ":"+ dna1+"\nBLOB 2-"+ blob2_gender+ ":" + dna2);
-
-                                
-
                                 dna1 = codon_to_dna(blob3_codon);
-
                                 double c_g=find_c_g(blob3_codon,faulty);
                                 double ratio = (c_g * 100 / (double)blob3_codon.Length);
-
                                 if (generation >= 1 && generation < 20)
                                 {
                                     Console.Write("\nBLOB 3-" + blob3_gender + ":");
@@ -1050,10 +1066,10 @@ namespace MarsGen
                             Console.Write("Answer:");
                             answer = Console.ReadLine().ToLower();
                             if ((answer == "main menu" || answer == "m") || (answer == "menu" || answer == "main"))
-                                game = true;
+                            { project = true; Console.Clear(); }
                             else if (answer == "quit" || answer == "q")
                             {
-                                game = false;
+                                project = false;
                             }
                             break;
                         default:
